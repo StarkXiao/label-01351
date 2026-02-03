@@ -13,7 +13,6 @@
   <block wx:else>
     <!-- 用户信息卡片 -->
     <view class="user-card">
-      <view class="user-bg"></view>
       <view class="user-content">
         <view class="user-avatar">
           <text class="avatar-text">{{userInfo.nickname[0] || '用'}}</text>

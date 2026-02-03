@@ -139,19 +139,23 @@ Page({
    */
   async onSubmit() {
     // 防止重复提交
-    if (!this.data.canSubmit || this.data.submitting) return;
+    if (this.data.submitting) return;
     
     const { title, category, content } = this.data.formData;
     
-    // 表单验证
-    const validation = util.validateForm(this.data.formData, [
-      { field: 'title', required: true, minLength: 2, maxLength: 50, message: '标题需要2-50个字符' },
-      { field: 'category', required: true, message: '请选择文章分类' },
-      { field: 'content', required: true, minLength: 10, message: '内容至少需要10个字符' }
-    ]);
+    // 表单验证并提示
+    if (!title || title.trim().length < 2) {
+      wx.showToast({ title: '请输入文章标题（至少2字）', icon: 'none' });
+      return;
+    }
     
-    if (!validation.valid) {
-      wx.showToast({ title: validation.message, icon: 'none' });
+    if (!category) {
+      wx.showToast({ title: '请选择文章分类', icon: 'none' });
+      return;
+    }
+    
+    if (!content || content.trim().length < 10) {
+      wx.showToast({ title: '请输入文章内容（至少10字）', icon: 'none' });
       return;
     }
     

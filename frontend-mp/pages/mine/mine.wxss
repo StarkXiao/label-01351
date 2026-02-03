@@ -34,15 +34,14 @@
 
 .user-content {
   display: flex;
-  align-items: flex-end;
-  padding: 0 40rpx;
-  margin-top: -80rpx;
+  padding: 24rpx;
   position: relative;
+  align-items: center;
 }
 
 .user-avatar {
-  width: 140rpx;
-  height: 140rpx;
+  width: 80rpx;
+  height: 80rpx;
   border-radius: 50%;
   background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
   display: flex;
@@ -54,7 +53,7 @@
 }
 
 .avatar-text {
-  font-size: 56rpx;
+  font-size: 40rpx;
   font-weight: bold;
   color: #FFFFFF;
   text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.2);
@@ -74,6 +73,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.user-welcome {
+  font-size: 26rpx;
+  color: #888888;
 }
 
 .user-id {
@@ -112,7 +116,6 @@
   display: flex;
   align-items: center;
   background: linear-gradient(180deg, #fefefe 0%, #faf8f5 100%);
-  margin-top: 28rpx;
 }
 
 .stat-item {
