@@ -57,19 +57,55 @@ node mock/server.js
 
 ```
 frontend-mp/
-├── app.js                 # 小程序入口，全局状态管理
-├── app.json               # 小程序配置
-├── app.wxss               # 全局样式
-├── pages/
-│   ├── index/             # 首页 - 文章列表
-│   ├── detail/            # 文章详情页
-│   ├── publish/           # 投稿页
-│   ├── mine/              # 我的页面
-│   └── login/             # 登录页
-├── utils/
-│   ├── api.js             # API 接口封装
-│   └── util.js            # 工具函数
-├── mock/
-│   └── server.js          # Mock 服务器
-└── assets/                # 静态资源
+├── app.js                          # 小程序入口，全局状态管理
+├── app.json                        # 小程序配置
+├── app.wxss                        # 全局样式
+├── Dockerfile                      # Docker 配置文件
+├── package.json                    # 项目依赖配置
+├── project.config.json             # 项目配置
+├── project.private.config.json     # 项目私有配置
+├── sitemap.json                    # 小程序索引配置
+├── assets/                         # 静态资源
+│   └── icons/                      # 图标资源
+│       ├── home.png                # 首页图标
+│       ├── home-active.png         # 首页选中图标
+│       ├── publish.png             # 投稿图标
+│       ├── publish-active.png      # 投稿选中图标
+│       ├── mine.png                # 我的图标
+│       ├── mine-active.png         # 我的选中图标
+│       └── README.md               # 图标说明
+├── mock/                           # Mock 服务
+│   └── server.js                   # Mock 服务器
+├── pages/                          # 页面目录
+│   ├── index/                      # 首页 - 文章列表
+│   │   ├── index.js
+│   │   ├── index.json
+│   │   ├── index.wxml
+│   │   └── index.wxss
+│   ├── detail/                     # 文章详情页
+│   │   ├── detail.js
+│   │   ├── detail.json
+│   │   ├── detail.wxml
+│   │   └── detail.wxss
+│   ├── publish/                    # 投稿页
+│   │   ├── publish.js
+│   │   ├── publish.json
+│   │   ├── publish.wxml
+│   │   └── publish.wxss
+│   ├── mine/                       # 我的页面
+│   │   ├── mine.js
+│   │   ├── mine.json
+│   │   ├── mine.wxml
+│   │   └── mine.wxss
+│   └── login/                      # 登录页
+│       ├── login.js
+│       ├── login.json
+│       ├── login.wxml
+│       └── login.wxss
+├── scripts/                        # 脚本目录
+│   └── generate-icons.js           # 图标生成脚本
+└── utils/                          # 工具函数
+    ├── api.js                      # API 接口封装
+    ├── icons.js                    # 图标工具
+    └── util.js                     # 通用工具函数
 ```
