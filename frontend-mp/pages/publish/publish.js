@@ -28,7 +28,8 @@ Page({
     // 表单状态
     canSubmit: false,    // 是否可以提交
     submitting: false,   // 提交中状态
-    showSuccess: false   // 显示成功弹窗
+    showSuccess: false,  // 显示成功弹窗
+    newArticleId: ''     // 新发布的文章ID
   },
 
   onLoad() {
@@ -167,9 +168,10 @@ Page({
       wx.hideLoading();
       
       if (res.code === 200) {
-        // 发布成功，清空表单
+        // 发布成功，保存文章ID，清空表单
         this.setData({ 
           showSuccess: true,
+          newArticleId: res.data.id,
           formData: {
             title: '',
             category: '',
@@ -205,10 +207,16 @@ Page({
   },
 
   /**
-   * 查看文章 - 跳转到首页
+   * 查看文章 - 跳转到文章详情
    */
   goToHome() {
+    const { newArticleId } = this.data;
     this.setData({ showSuccess: false });
-    wx.switchTab({ url: '/pages/index/index' });
+    
+    if (newArticleId) {
+      wx.navigateTo({ url: '/pages/detail/detail?id=' + newArticleId });
+    } else {
+      wx.switchTab({ url: '/pages/index/index' });
+    }
   }
 });
