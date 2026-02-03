@@ -2,24 +2,82 @@
 
 ## How to Run
 
+### 方式一：微信开发者工具（推荐）
+
 1. 安装微信开发者工具
 2. 打开微信开发者工具，导入项目，选择 `frontend-mp` 目录
 3. 在项目设置中关闭"ES6 转 ES5"、"增强编译"等选项（如遇兼容问题可开启）
 4. 点击编译即可预览
+
+### 方式二：Docker 部署 Mock 服务
+
+```bash
+# 启动 Mock 服务
+docker-compose up -d
+
+# 查看服务状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f frontend-mp
+
+# 停止服务
+docker-compose down
+```
+
+服务启动后，Mock API 地址为：`http://localhost:8081`
 
 ## Services
 
 | 服务 | 说明 | 端口 |
 |------|------|------|
 | 微信小程序前端 | 乡村文化库主应用 | - |
-| Mock Server（可选） | 本地模拟后端服务 | 3000 |
+| Mock Server | 本地模拟后端服务 | 8081 (Docker) / 3000 (本地) |
 
-启动 Mock Server（可选）：
+### Mock Server 接入说明
+
+本项目默认使用本地存储（wx.setStorageSync）模拟数据，无需启动 Mock Server 即可运行。
+
+如需使用 Mock Server：
+
+**本地启动：**
 ```bash
 cd frontend-mp
 npm install
 node mock/server.js
+# 服务运行在 http://localhost:3000
 ```
+
+**Docker 启动：**
+```bash
+docker-compose up -d
+# 服务运行在 http://localhost:8081
+```
+
+**接入小程序：**
+
+修改 `frontend-mp/app.js` 中的 `baseUrl`：
+```javascript
+globalData: {
+  baseUrl: 'http://localhost:8081'  // Docker 部署
+  // baseUrl: 'http://localhost:3000'  // 本地启动
+}
+```
+
+**Mock API 接口列表：**
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| /api/health | GET | 健康检查 |
+| /api/article/list | GET | 获取文章列表 |
+| /api/article/detail/:id | GET | 获取文章详情 |
+| /api/article/publish | POST | 发布文章 |
+| /api/article/my | GET | 获取我的文章 |
+| /api/article/like/:id | POST | 点赞文章 |
+| /api/category/list | GET | 获取分类列表 |
+| /api/user/info | GET | 获取用户信息 |
+| /api/user/update | POST | 更新用户信息 |
+| /api/user/stats | GET | 获取用户统计 |
 
 ## 测试账号
 
