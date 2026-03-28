@@ -392,6 +392,254 @@ const unlikeArticle = async (id) => {
   }, '取消点赞失败');
 };
 
+/**
+ * 获取问题列表
+ * @param {Object} params - 查询参数
+ * @param {string} params.category - 分类ID，'all'表示全部
+ * @param {number} params.page - 页码，从1开始
+ * @param {number} params.pageSize - 每页数量
+ * @param {string} params.keyword - 搜索关键词
+ * @returns {Promise<Object>} - 问题列表数据
+ */
+const getQuestionList = async (params = {}) => {
+  return withErrorHandler(async () => {
+    await delay(500);
+    
+    const { category = 'all', page = 1, pageSize = 10, keyword = '' } = params;
+    
+    let questions = wx.getStorageSync('questions') || [];
+    
+    // 只显示已发布的问题（status === 1）
+    questions = questions.filter(item => item.status === 1);
+    
+    // 分类筛选
+    if (category && category !== 'all') {
+      questions = questions.filter(item => item.category === category);
+    }
+    
+    // 关键词搜索（标题和内容）
+    if (keyword && keyword.trim()) {
+      const kw = keyword.toLowerCase().trim();
+      questions = questions.filter(item => 
+        item.title.toLowerCase().includes(kw) || 
+        item.content.toLowerCase().includes(kw)
+      );
+    }
+    
+    // 按发布时间倒序排列
+    questions.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+    
+    // 分页处理
+    const total = questions.length;
+    const start = (page - 1) * pageSize;
+    const list = questions.slice(start, start + pageSize);
+    
+    return {
+      code: 200,
+      data: {
+        list,
+        total,
+        page,
+        pageSize,
+        hasMore: start + pageSize < total
+      },
+      message: 'success'
+    };
+  }, '获取问题列表失败');
+};
+
+/**
+ * 获取问题详情
+ * @param {string} id - 问题ID
+ * @returns {Promise<Object>} - 问题详情数据
+ */
+const getQuestionDetail = async (id) => {
+  return withErrorHandler(async () => {
+    await delay(300);
+    
+    if (!id) {
+      return { code: 400, data: null, message: '问题ID不能为空' };
+    }
+    
+    const questions = wx.getStorageSync('questions') || [];
+    const question = questions.find(item => item.id === id);
+    
+    if (!question) {
+      return { code: 404, data: null, message: '问题不存在' };
+    }
+    
+    // 增加浏览量
+    question.viewCount = (question.viewCount || 0) + 1;
+    wx.setStorageSync('questions', questions);
+    
+    return {
+      code: 200,
+      data: question,
+      message: 'success'
+    };
+  }, '获取问题详情失败');
+};
+
+/**
+ * 发布问题
+ * @param {Object} data - 问题数据
+ * @param {string} data.title - 问题标题
+ * @param {string} data.content - 问题内容
+ * @param {string} data.category - 分类ID
+ * @returns {Promise<Object>} - 发布结果
+ */
+const publishQuestion = async (data) => {
+  return withErrorHandler(async () => {
+    await delay(800);
+    
+    // 参数校验
+    if (!data.title || !data.title.trim()) {
+      return { code: 400, data: null, message: '问题标题不能为空' };
+    }
+    if (!data.content || !data.content.trim()) {
+      return { code: 400, data: null, message: '问题描述不能为空' };
+    }
+    if (!data.category) {
+      return { code: 400, data: null, message: '请选择分类' };
+    }
+    
+    // 获取用户信息
+    let userInfo = wx.getStorageSync('userInfo');
+    if (!userInfo) {
+      userInfo = {
+        id: 'user_001',
+        nickname: '乡村文化爱好者'
+      };
+    }
+    
+    const questions = wx.getStorageSync('questions') || [];
+    
+    // 创建新问题
+    const newQuestion = {
+      id: util.generateId('question'),
+      title: data.title.trim(),
+      content: data.content.trim(),
+      category: data.category,
+      authorId: userInfo.id,
+      authorName: userInfo.nickname,
+      viewCount: 0,
+      answerCount: 0,
+      createTime: util.formatDate(new Date(), 'YYYY-MM-DD'),
+      status: 1,
+      answers: []
+    };
+    
+    // 添加到列表头部
+    questions.unshift(newQuestion);
+    wx.setStorageSync('questions', questions);
+    
+    return {
+      code: 200,
+      data: newQuestion,
+      message: '发布成功'
+    };
+  }, '发布问题失败');
+};
+
+/**
+ * 回答问题
+ * @param {string} questionId - 问题ID
+ * @param {Object} data - 回答数据
+ * @param {string} data.content - 回答内容
+ * @returns {Promise<Object>} - 回答结果
+ */
+const answerQuestion = async (questionId, data) => {
+  return withErrorHandler(async () => {
+    await delay(500);
+    
+    if (!questionId) {
+      return { code: 400, data: null, message: '问题ID不能为空' };
+    }
+    if (!data.content || !data.content.trim()) {
+      return { code: 400, data: null, message: '回答内容不能为空' };
+    }
+    
+    // 获取用户信息
+    let userInfo = wx.getStorageSync('userInfo');
+    if (!userInfo) {
+      userInfo = {
+        id: 'user_001',
+        nickname: '乡村文化爱好者'
+      };
+    }
+    
+    const questions = wx.getStorageSync('questions') || [];
+    const question = questions.find(item => item.id === questionId);
+    
+    if (!question) {
+      return { code: 404, data: null, message: '问题不存在' };
+    }
+    
+    // 创建新回答
+    const newAnswer = {
+      id: util.generateId('answer'),
+      content: data.content.trim(),
+      authorId: userInfo.id,
+      authorName: userInfo.nickname,
+      createTime: util.formatDate(new Date(), 'YYYY-MM-DD'),
+      likeCount: 0
+    };
+    
+    // 添加回答
+    if (!question.answers) {
+      question.answers = [];
+    }
+    question.answers.push(newAnswer);
+    question.answerCount = (question.answerCount || 0) + 1;
+    
+    wx.setStorageSync('questions', questions);
+    
+    return {
+      code: 200,
+      data: newAnswer,
+      message: '回答成功'
+    };
+  }, '回答问题失败');
+};
+
+/**
+ * 点赞回答
+ * @param {string} questionId - 问题ID
+ * @param {string} answerId - 回答ID
+ * @returns {Promise<Object>} - 点赞结果
+ */
+const likeAnswer = async (questionId, answerId) => {
+  return withErrorHandler(async () => {
+    await delay(200);
+    
+    if (!questionId || !answerId) {
+      return { code: 400, data: null, message: '参数不能为空' };
+    }
+    
+    const questions = wx.getStorageSync('questions') || [];
+    const question = questions.find(item => item.id === questionId);
+    
+    if (!question) {
+      return { code: 404, data: null, message: '问题不存在' };
+    }
+    
+    const answer = question.answers.find(item => item.id === answerId);
+    if (!answer) {
+      return { code: 404, data: null, message: '回答不存在' };
+    }
+    
+    // 增加点赞数
+    answer.likeCount = (answer.likeCount || 0) + 1;
+    wx.setStorageSync('questions', questions);
+    
+    return {
+      code: 200,
+      data: { likeCount: answer.likeCount },
+      message: '点赞成功'
+    };
+  }, '点赞失败');
+};
+
 module.exports = {
   getArticleList,
   getArticleDetail,
@@ -402,5 +650,10 @@ module.exports = {
   updateUserInfo,
   getUserStats,
   likeArticle,
-  unlikeArticle
+  unlikeArticle,
+  getQuestionList,
+  getQuestionDetail,
+  publishQuestion,
+  answerQuestion,
+  likeAnswer
 };

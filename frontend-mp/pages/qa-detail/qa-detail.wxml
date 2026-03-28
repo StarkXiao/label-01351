@@ -1,0 +1,120 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view wx:elif="{{!question}}" class="empty-container">
+    <text class="empty-text">问题不存在或已被删除</text>
+    <button class="empty-btn" bindtap="goBack">返回</button>
+  </view>
+
+  <view wx:else class="detail-container">
+    <view class="question-header">
+      <text class="question-title">{{question.title}}</text>
+      <view class="question-meta">
+        <view class="meta-item">
+          <text class="meta-label">分类：</text>
+          <text class="meta-value">{{question.categoryName}}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">发布者：</text>
+          <text class="meta-value">{{question.authorName}}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">发布时间：</text>
+          <text class="meta-value">{{question.createTime}}</text>
+        </view>
+      </view>
+      <view class="question-stats">
+        <view class="stat-item">
+          <text class="stat-icon">👁️</text>
+          <text class="stat-text">{{question.viewCount}} 浏览</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-icon">💬</text>
+          <text class="stat-text">{{question.answerCount}} 回答</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="question-content">
+      <text class="content-text">{{question.content}}</text>
+    </view>
+
+    <view class="answers-section">
+      <view class="section-header">
+        <text class="section-title">回答 ({{question.answers.length}})</text>
+      </view>
+
+      <view wx:if="{{question.answers.length === 0}}" class="no-answers">
+        <text class="no-answers-text">暂无回答，快来抢沙发吧！</text>
+      </view>
+
+      <view wx:else class="answers-list">
+        <view 
+          wx:for="{{question.answers}}" 
+          wx:key="id" 
+          class="answer-item"
+        >
+          <view class="answer-header">
+            <view class="answer-author">
+              <view class="avatar-placeholder">{{answer.authorName.charAt(0)}}</view>
+              <text class="author-name">{{answer.authorName}}</text>
+            </view>
+            <text class="answer-time">{{answer.createTime}}</text>
+          </view>
+          <view class="answer-content">
+            <text class="answer-text">{{answer.content}}</text>
+          </view>
+          <view class="answer-actions">
+            <view 
+              class="action-btn like-btn" 
+              bindtap="onLikeAnswer" 
+              data-answerid="{{answer.id}}"
+            >
+              <text class="action-icon">👍</text>
+              <text class="action-text">{{answer.likeCount}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="answer-btn-container">
+      <button 
+        class="answer-btn" 
+        bindtap="openAnswerModal"
+        hover-class="answer-btn-hover"
+      >
+        我来回答
+      </button>
+    </view>
+  </view>
+
+  <view wx:if="{{showAnswerModal}}" class="modal-mask" bindtap="closeAnswerModal">
+    <view class="modal-container" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">回答问题</text>
+        <view class="modal-close" bindtap="closeAnswerModal">
+          <text class="close-icon">✕</text>
+        </view>
+      </view>
+      <view class="modal-body">
+        <textarea 
+          class="answer-textarea"
+          placeholder="请输入您的回答..."
+          value="{{answerContent}}"
+          bindinput="onAnswerInput"
+          maxlength="500"
+          auto-height
+        ></textarea>
+        <view class="char-count">{{answerContent.length}}/500</view>
+      </view>
+      <view class="modal-footer">
+        <button class="modal-btn cancel-btn" bindtap="closeAnswerModal">取消</button>
+        <button class="modal-btn confirm-btn" bindtap="submitAnswer">提交回答</button>
+      </view>
+    </view>
+  </view>
+</view>

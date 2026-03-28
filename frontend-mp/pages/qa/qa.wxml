@@ -1,0 +1,129 @@
+<view class="container">
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <input 
+        class="search-input" 
+        placeholder="搜索问题..." 
+        value="{{keyword}}" 
+        bindinput="onSearchInput" 
+        bindconfirm="onSearch"
+        confirm-type="search"
+      />
+      <view class="search-icon" bindtap="onSearch">🔍</view>
+      <view wx:if="{{keyword}}" class="clear-icon" bindtap="clearSearch">✕</view>
+    </view>
+  </view>
+
+  <scroll-view class="category-scroll" scroll-x="{{true}}">
+    <view 
+      class="category-item {{currentCategory === item.id ? 'active' : ''}}" 
+      wx:for="{{categories}}" 
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onCategoryChange"
+    >
+      {{item.name}}
+    </view>
+  </scroll-view>
+
+  <view class="question-list">
+    <view 
+      class="question-card" 
+      wx:for="{{questionList}}" 
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goToDetail"
+    >
+      <view class="question-title">{{item.title}}</view>
+      <view class="question-summary">{{item.summary}}</view>
+      <view class="question-footer">
+        <view class="question-tag">{{item.categoryName}}</view>
+        <view class="question-meta">
+          <text class="meta-item">👁️ {{item.viewCount}}</text>
+          <text class="meta-item">💬 {{item.answerCount}}</text>
+          <text class="meta-item">📅 {{item.createTime}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{!loading && questionList.length === 0}}" class="empty-state">
+      <text class="empty-icon">❓</text>
+      <text class="empty-text">暂无问题</text>
+    </view>
+
+    <view wx:if="{{loadingMore}}" class="loading-more">
+      <text>加载中...</text>
+    </view>
+  </view>
+
+  <view wx:if="{{isLoggedIn}}" class="publish-btn" bindtap="showPublishModal">
+    <text class="publish-icon">+</text>
+    <text class="publish-text">提问</text>
+  </view>
+
+  <view wx:if="{{!isLoggedIn}}" class="login-prompt">
+    <text>登录后即可提问</text>
+    <button class="login-btn" bindtap="goToLogin">去登录</button>
+  </view>
+</view>
+
+<view wx:if="{{showPublishForm}}" class="modal-mask" bindtap="hidePublishModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">发布问题</text>
+      <view class="modal-close" bindtap="hidePublishModal">✕</view>
+    </view>
+    
+    <view class="modal-body">
+      <view class="form-item">
+        <view class="form-label">问题标题</view>
+        <input 
+          class="form-input" 
+          placeholder="请输入问题标题（至少2字）" 
+          value="{{formData.title}}" 
+          bindinput="onTitleInput"
+          maxlength="50"
+        />
+      </view>
+      
+      <view class="form-item">
+        <view class="form-label">选择分类</view>
+        <view class="category-select">
+          <view 
+            class="category-tag {{formData.category === item.id ? 'selected' : ''}}" 
+            wx:for="{{categories}}" 
+            wx:key="id"
+            wx:if="{{item.id !== 'all'}}"
+            data-id="{{item.id}}"
+            bindtap="onCategorySelect"
+          >
+            {{item.name}}
+          </view>
+        </view>
+      </view>
+      
+      <view class="form-item">
+        <view class="form-label">问题描述</view>
+        <textarea 
+          class="form-textarea" 
+          placeholder="请详细描述您的问题（至少5字）" 
+          value="{{formData.content}}" 
+          bindinput="onContentInput"
+          maxlength="500"
+          auto-height
+        />
+      </view>
+    </view>
+    
+    <view class="modal-footer">
+      <button class="modal-btn cancel-btn" bindtap="hidePublishModal">取消</button>
+      <button 
+        class="modal-btn confirm-btn {{!canSubmit || submitting ? 'disabled' : ''}}" 
+        bindtap="onSubmit"
+        disabled="{{!canSubmit || submitting}}"
+      >
+        {{submitting ? '发布中...' : '发布'}}
+      </button>
+    </view>
+  </view>
+</view>

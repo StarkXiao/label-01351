@@ -161,5 +161,78 @@ App({
       ];
       wx.setStorageSync('categories', defaultCategories);
     }
+
+    // 初始化问答数据
+    const questions = wx.getStorageSync('questions');
+    if (!questions || questions.length === 0) {
+      const defaultQuestions = [
+        {
+          id: 'question_001',
+          title: '端午节为什么要吃粽子？',
+          content: '听说端午节吃粽子是为了纪念屈原，但具体是怎么回事呢？',
+          category: 'folklore',
+          authorId: 'user_001',
+          authorName: '张大爷',
+          viewCount: 156,
+          answerCount: 2,
+          createTime: '2024-12-20',
+          status: 1,
+          answers: [
+            {
+              id: 'answer_001',
+              content: '端午节吃粽子确实是为了纪念屈原。相传屈原投江后，百姓们怕江里的鱼虾咬食屈原的身体，就用竹筒装米投入江中，后来逐渐演变成了粽子。',
+              authorId: 'user_002',
+              authorName: '李阿姨',
+              createTime: '2024-12-20',
+              likeCount: 8
+            },
+            {
+              id: 'answer_002',
+              authorName: '王老师',
+              content: '除了纪念屈原，粽子也有祈求丰收、驱邪避瘟的寓意。在古代，人们认为粽子的形状像牛角，有祭祀祖先和神灵的意义。',
+              authorId: 'user_003',
+              createTime: '2024-12-21',
+              likeCount: 12
+            }
+          ]
+        },
+        {
+          id: 'question_002',
+          title: '春耕有什么讲究？',
+          content: '马上就要到春耕时节了，想问问大家春耕都有哪些需要注意的地方？',
+          authorId: 'user_004',
+          authorName: '陈奶奶',
+          category: 'farming',
+          viewCount: 234,
+          answerCount: 1,
+          createTime: '2024-12-18',
+          status: 1,
+          answers: [
+            {
+              id: 'answer_003',
+              content: '春耕最重要的是看节气，清明前后是种瓜点豆的好时候。还要看天气，不能太早也不能太晚。种地要根据不同的作物选择合适的时间。',
+              authorId: 'user_005',
+              authorName: '刘大伯',
+              createTime: '2024-12-18',
+              likeCount: 15
+            }
+          ]
+        },
+        {
+          id: 'question_003',
+          title: '如何制作传统的布鞋？',
+          content: '小时候穿过奶奶做的布鞋特别舒服，想知道具体是怎么做的？',
+          authorId: 'user_002',
+          authorName: '李阿姨',
+          category: 'craft',
+          viewCount: 189,
+          answerCount: 0,
+          createTime: '2024-12-15',
+          status: 1,
+          answers: []
+        }
+      ];
+      wx.setStorageSync('questions', defaultQuestions);
+    }
   }
 });
