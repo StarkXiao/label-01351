@@ -4,7 +4,8 @@
     "pages/publish/publish",
     "pages/mine/mine",
     "pages/detail/detail",
-    "pages/login/login"
+    "pages/login/login",
+    "pages/qa/qa"
   ],
   "window": {
     "backgroundTextStyle": "dark",
@@ -30,6 +31,12 @@
         "text": "投稿",
         "iconPath": "assets/icons/publish.png",
         "selectedIconPath": "assets/icons/publish-active.png"
+      },
+      {
+        "pagePath": "pages/qa/qa",
+        "text": "问答",
+        "iconPath": "assets/icons/qa.png",
+        "selectedIconPath": "assets/icons/qa-active.png"
       },
       {
         "pagePath": "pages/mine/mine",

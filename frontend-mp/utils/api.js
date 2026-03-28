@@ -392,6 +392,155 @@ const unlikeArticle = async (id) => {
   }, '取消点赞失败');
 };
 
+const getQuestionList = async (params = {}) => {
+  return withErrorHandler(async () => {
+    await delay(500);
+    
+    const { page = 1, pageSize = 10 } = params;
+    
+    let questions = wx.getStorageSync('questions') || [];
+    
+    questions.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+    
+    const total = questions.length;
+    const start = (page - 1) * pageSize;
+    const list = questions.slice(start, start + pageSize);
+    
+    return {
+      code: 200,
+      data: {
+        list,
+        total,
+        page,
+        pageSize,
+        hasMore: start + pageSize < total
+      },
+      message: 'success'
+    };
+  }, '获取问题列表失败');
+};
+
+const getQuestionDetail = async (id) => {
+  return withErrorHandler(async () => {
+    await delay(300);
+    
+    if (!id) {
+      return { code: 400, data: null, message: '问题ID不能为空' };
+    }
+    
+    const questions = wx.getStorageSync('questions') || [];
+    const question = questions.find(item => item.id === id);
+    
+    if (!question) {
+      return { code: 404, data: null, message: '问题不存在' };
+    }
+    
+    question.viewCount = (question.viewCount || 0) + 1;
+    wx.setStorageSync('questions', questions);
+    
+    return {
+      code: 200,
+      data: question,
+      message: 'success'
+    };
+  }, '获取问题详情失败');
+};
+
+const publishQuestion = async (data) => {
+  return withErrorHandler(async () => {
+    await delay(800);
+    
+    if (!data.title || !data.title.trim()) {
+      return { code: 400, data: null, message: '问题标题不能为空' };
+    }
+    if (!data.content || !data.content.trim()) {
+      return { code: 400, data: null, message: '问题描述不能为空' };
+    }
+    
+    let userInfo = wx.getStorageSync('userInfo');
+    if (!userInfo) {
+      userInfo = {
+        id: 'user_001',
+        nickname: '乡村文化爱好者'
+      };
+    }
+    
+    const questions = wx.getStorageSync('questions') || [];
+    
+    const newQuestion = {
+      id: util.generateId('question'),
+      title: data.title.trim(),
+      content: data.content.trim(),
+      authorId: userInfo.id,
+      authorName: userInfo.nickname,
+      viewCount: 0,
+      answerCount: 0,
+      answers: [],
+      createTime: util.formatDate(new Date(), 'YYYY-MM-DD HH:mm'),
+      status: 1
+    };
+    
+    questions.unshift(newQuestion);
+    wx.setStorageSync('questions', questions);
+    
+    return {
+      code: 200,
+      data: newQuestion,
+      message: '发布成功'
+    };
+  }, '发布问题失败');
+};
+
+const answerQuestion = async (data) => {
+  return withErrorHandler(async () => {
+    await delay(600);
+    
+    if (!data.questionId) {
+      return { code: 400, data: null, message: '问题ID不能为空' };
+    }
+    if (!data.content || !data.content.trim()) {
+      return { code: 400, data: null, message: '回答内容不能为空' };
+    }
+    
+    let userInfo = wx.getStorageSync('userInfo');
+    if (!userInfo) {
+      userInfo = {
+        id: 'user_001',
+        nickname: '乡村文化爱好者'
+      };
+    }
+    
+    const questions = wx.getStorageSync('questions') || [];
+    const question = questions.find(item => item.id === data.questionId);
+    
+    if (!question) {
+      return { code: 404, data: null, message: '问题不存在' };
+    }
+    
+    const newAnswer = {
+      id: util.generateId('answer'),
+      content: data.content.trim(),
+      authorId: userInfo.id,
+      authorName: userInfo.nickname,
+      createTime: util.formatDate(new Date(), 'YYYY-MM-DD HH:mm')
+    };
+    
+    if (!question.answers) {
+      question.answers = [];
+    }
+    question.answers.push(newAnswer);
+    question.answerCount = (question.answerCount || 0) + 1;
+    
+    wx.setStorageSync('questions', questions);
+    
+    return {
+      code: 200,
+      data: newAnswer,
+      message: '回答成功'
+    };
+  }, '回答问题失败');
+};
+
 module.exports = {
   getArticleList,
   getArticleDetail,
@@ -402,5 +551,9 @@ module.exports = {
   updateUserInfo,
   getUserStats,
   likeArticle,
-  unlikeArticle
+  unlikeArticle,
+  getQuestionList,
+  getQuestionDetail,
+  publishQuestion,
+  answerQuestion
 };
