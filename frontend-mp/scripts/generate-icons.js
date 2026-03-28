@@ -38,7 +38,7 @@ if (!fs.existsSync(iconsDir)) {
 }
 
 // 生成图标文件
-const icons = ['home', 'publish', 'mine'];
+const icons = ['home', 'publish', 'qa', 'mine'];
 icons.forEach(name => {
   fs.writeFileSync(path.join(iconsDir, `${name}.png`), grayPixel);
   fs.writeFileSync(path.join(iconsDir, `${name}-active.png`), brownPixel);
